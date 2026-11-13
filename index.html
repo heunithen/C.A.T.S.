@@ -4,8 +4,8 @@
 :root{color-scheme:dark;--bg:#101216;--paper:#191d24;--paper-2:#202630;--ink:#edf0f4;--muted:#9ba5b2;--line:#303844;--accent:#b58a50;--accent-hover:#c99b5e;--danger:#a94f52}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
-header{max-width:760px;margin:0 auto;padding:58px 24px 12px;display:flex;justify-content:center}
-.brand{font-size:clamp(64px,16vw,104px);font-weight:900;letter-spacing:.12em;line-height:1}.brand .c{color:#e46b62}.brand .a{color:#e4b84f}.brand .t{color:#65a8df}.brand .s{color:#75bd83}
+header{max-width:760px;margin:0 auto;padding:75px 24px 12px;display:flex;justify-content:center}
+.brand{font-size:clamp(83px,20.8vw,135px);font-weight:900;letter-spacing:.12em;line-height:1}.brand .c{color:#e46b62}.brand .a{color:#e4b84f}.brand .t{color:#65a8df}.brand .s{color:#75bd83}
 header small{display:none}
 main{max-width:760px;margin:0 auto;padding:28px 24px 64px}
 h1{font-size:clamp(34px,7vw,54px);line-height:1.08;letter-spacing:-.045em;margin:0 0 14px}
@@ -63,7 +63,7 @@ hr{border:0;border-top:1px solid var(--line)}
 </section>
 <section id="quizView" class="hidden"><div class="top"><span class="pill">RESULTADOS DEL GRUPO</span><button class="alt" id="resultsHome">Volver al inicio</button></div><h1 id="quizHeading">Cuestionario C.A.T.S.</h1><p class="muted">Resultados compartidos de las respuestas del grupo.</p><div id="responseCount" class="muted"></div><div id="quizResults"></div></section>
 <section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Salir</button><span class="pill">CUESTIONARIO C.A.T.S.</span></div><h1 id="answerQuizTitle"></h1><p class="muted">Responde una pregunta a la vez. Puedes volver atrás sin perder tus respuestas.</p><div class="progress"><i id="progressFill" style="width:0%"></i></div><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:24px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas registradas</h2><p class="muted">Tus respuestas se guardaron correctamente.</p><div id="myLinesVeils"></div><button id="answerDoneBack">Ver resultados del grupo</button></div></section>
-<div class="footer">C.A.T.S. · Versión 1.2.0</div>
+<div class="footer">C.A.T.S. · Versión 1.2.1</div>
 </main>
 <script>
 const API_URL='https://xnqyjjqfcibxnftyrwpe.supabase.co/functions/v1/cats-api',API_KEY='sb_publishable_U3Me4PLvpauz50xGfZMvxw_HYxJoM7T',ROOT='74ae0c75-2884-420d-b922-34cf37da1b1b';
