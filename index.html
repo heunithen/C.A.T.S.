@@ -15,7 +15,7 @@
 <div class="top"><h2>Cuestionarios</h2><span id="quizCount" class="pill"></span></div><div id="quizList" class="grid"></div></section>
 <section id="quizView" class="hidden"><div class="top"><button class="alt" id="backToDeposit">← Volver al depósito</button><span class="pill">CUESTIONARIO</span></div><h1 id="quizHeading"></h1><p class="muted">Cada selección o concepto escrito suma un voto.</p><button id="copyQuizLink">Copiar enlace para responder</button> <button class="alt hidden" id="editQuizButton">Editar nombre</button>
 <div id="quizAdminEdit" class="card hidden"><input id="editQuizTitle"><button id="saveQuizTitle">Guardar</button></div><div id="questionsAdmin"></div><h2>Resultados</h2><div id="responseCount" class="muted"></div><div id="quizResults"></div><div id="responseRecords"></div></section>
-<section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Volver</button><span class="pill">RESPONDER</span></div><p id="answerDepositName" class="muted"></p><h1 id="answerQuizTitle"></h1><p class="muted">Escribe tu nombre, selecciona alternativas y añade conceptos propios si está permitido.</p><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:18px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente →</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas guardadas</h2><button id="answerDoneBack">Volver al depósito</button></div></section>
+<section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Volver</button><span class="pill">RESPONDER</span></div><p id="answerDepositName" class="muted"></p><h1 id="answerQuizTitle"></h1><p class="muted">Responde una pregunta a la vez. Puedes avanzar y retroceder sin perder tus respuestas.</p><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:18px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente →</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas guardadas</h2><button id="answerDoneBack">Volver al depósito</button></div></section>
 <div class="footer">C.A.T.S. · Prototipo visual y funcional · Datos sincronizados en línea.</div></main>
 <script>
 const API_URL='https://xnqyjjqfcibxnftyrwpe.supabase.co/functions/v1/cats-api';
@@ -93,7 +93,7 @@ async function startAnswer(depositId,quizId){
     const q=getQ(quizId);if(!q)throw new Error('No se encontró el cuestionario.');
     answerCtx={d:D,q};answerStep=0;answerDraft={name:''};
     el('answerDepositName').textContent=D.name;el('answerQuizTitle').textContent=q.title;
-    el('answerDone').classList.add('hidden');el('answerForm').classList.remove('hidden');
+    el('answerDone').classList.add('hidden');el('answerProgress').classList.remove('hidden');el('answerForm').classList.remove('hidden');
     renderAnswerStep();show('answerView');
   }catch(e){alert(e.message);renderHome()}
 }
@@ -124,7 +124,7 @@ el('editQuizButton').onclick=()=>{el('quizAdminEdit').classList.toggle('hidden')
 el('saveQuizTitle').onclick=async()=>{const title=el('editQuizTitle').value.trim();if(!title)return;try{await api('rename_quiz',{quiz_id:Q.id,title,password:adminPassword});await reloadQuiz()}catch(e){alert(e.message)}};
 document.addEventListener('click',async e=>{if(e.target.id!=='addQuestion')return;const prompt=el('newQuestionText').value.trim(),options=el('newQuestionOptions').value.split('\n').map(x=>x.trim()).filter(Boolean);if(!prompt||!options.length)return alert('Completa el enunciado y las alternativas.');try{await api('add_question',{quiz_id:Q.id,prompt,options,multi:el('newQuestionMulti').checked,allow_custom:el('newQuestionCustom').checked,password:adminPassword});await reloadQuiz()}catch(err){alert(err.message)}});
 el('answerPrev').onclick=()=>{captureAnswerStep();if(answerStep>0){answerStep--;renderAnswerStep()}};
-el('answerNext').onclick=()=>{captureAnswerStep();if(answerStep<answerCtx.q.questions.length){answerStep++;renderAnswerStep()}};
+el('answerNext').onclick=()=>{captureAnswerStep();if(answerStep===0&&!answerDraft.name){alert('Escribe tu nombre para continuar.');return}if(answerStep<answerCtx.q.questions.length){answerStep++;renderAnswerStep()}};
 el('answerForm').onsubmit=async e=>{
   e.preventDefault();captureAnswerStep();
   const name=(answerDraft.name||'').trim();if(!name){alert('Escribe tu nombre para continuar.');answerStep=0;renderAnswerStep();return}
