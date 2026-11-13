@@ -46,8 +46,8 @@ hr{border:0;border-top:1px solid var(--line)}
 <section id="landingView" class="hero">
 <div class="hero-mark">UNA HERRAMIENTA PARA JUEGOS DE ROL</div>
 <h1>Construyan la partida que quieren jugar.</h1>
-<p>Responde unas preguntas breves para reunir las ideas del grupo y definir la partida.</p>
-<div class="row" style="justify-content:center;flex-wrap:wrap"><button id="startAnswer">Hacer cuestionario</button><button class="alt" id="viewResults">Ver resultados</button></div>
+<p>Responde unas preguntas breves para reunir las ideas del grupo y definir la partida.</p><div class="card" style="max-width:560px;text-align:left;margin:0 0 24px"><h2 style="margin-top:0">¿Qué es C.A.T.S.?</h2><p style="margin-bottom:10px">C.A.T.S. es un método para ponerse de acuerdo sobre cómo será una partida de rol antes de comenzar. Ayuda al grupo a compartir sus expectativas y establecer una base común para la experiencia.</p><p style="margin-bottom:0"><b>Concepto:</b> de qué tratará la partida.<br><b>Objetivo:</b> qué intentarán conseguir los personajes.<br><b>Tono:</b> qué estilo y ambiente tendrá la historia.<br><b>Temas:</b> qué contenidos se pueden incluir y cuáles se deben evitar o tratar fuera de escena.</p></div>
+<div class="row" style="justify-content:center;flex-wrap:wrap"><button id="startAnswer">Responder cuestionario</button><button class="alt" id="viewResults">Ver resultados</button></div>
 <button class="text-button" id="adminToggle">Administración</button>
 <div id="adminPanel" class="card hidden" style="width:min(100%,420px);text-align:left">
 <h2>Administración</h2>
@@ -63,7 +63,7 @@ hr{border:0;border-top:1px solid var(--line)}
 </section>
 <section id="quizView" class="hidden"><div class="top"><span class="pill">RESULTADOS DEL GRUPO</span><button class="alt" id="resultsHome">Volver al inicio</button></div><h1 id="quizHeading">Cuestionario C.A.T.S.</h1><p class="muted">Resultados compartidos de las respuestas del grupo.</p><div id="responseCount" class="muted"></div><div id="quizResults"></div></section>
 <section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Salir</button><span class="pill">CUESTIONARIO C.A.T.S.</span></div><h1 id="answerQuizTitle"></h1><p class="muted">Responde una pregunta a la vez. Puedes volver atrás sin perder tus respuestas.</p><div class="progress"><i id="progressFill" style="width:0%"></i></div><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:24px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas registradas</h2><p class="muted">Tus respuestas se guardaron correctamente.</p><div id="myLinesVeils"></div><button id="answerDoneBack">Ver resultados del grupo</button></div></section>
-<div class="footer">C.A.T.S. · Versión 1.1.1</div>
+<div class="footer">C.A.T.S. · Versión 1.1.2</div>
 </main>
 <script>
 const API_URL='https://xnqyjjqfcibxnftyrwpe.supabase.co/functions/v1/cats-api',API_KEY='sb_publishable_U3Me4PLvpauz50xGfZMvxw_HYxJoM7T',ROOT='74ae0c75-2884-420d-b922-34cf37da1b1b';
