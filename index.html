@@ -1,8 +1,9 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>C.A.T.S. — Cuestionario público</title>
-<style>:root{--bg:#f4f2ed;--paper:#fffefa;--ink:#20231f;--muted:#777b73;--line:#e6e3db;--accent:#315c4b;--accent-hover:#244839}
+<style>
+:root{color-scheme:dark;--bg:#101216;--paper:#191d24;--paper-2:#202630;--ink:#edf0f4;--muted:#9ba5b2;--line:#303844;--accent:#b58a50;--accent-hover:#c99b5e;--danger:#a94f52}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
 header{max-width:760px;margin:0 auto;padding:34px 24px 12px;display:flex;justify-content:center}
 .brand{font-size:22px;font-weight:850;letter-spacing:.16em}.brand span{color:var(--accent)}
 header small{display:none}
@@ -13,27 +14,30 @@ p{margin:0 0 18px}.muted,small{color:var(--muted)}
 .hero{min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 12px}
 .hero-mark{font-size:12px;letter-spacing:.22em;font-weight:800;color:var(--accent);margin-bottom:24px}
 .hero h1{max-width:620px}.hero p{max-width:430px;color:var(--muted);margin-bottom:30px}
-button{border:0;border-radius:12px;padding:14px 22px;background:var(--accent);color:white;font:inherit;font-weight:700;cursor:pointer;transition:background .15s,transform .15s}
-button:hover{background:var(--accent-hover)}button:active{transform:translateY(1px)}button:disabled{opacity:.55;cursor:wait}
-button.alt{background:#eeece5;color:var(--ink)}button.alt:hover{background:#e5e2d9}
-button.danger{background:#f5e8e5;color:#8d3930}
+button{border:1px solid transparent;border-radius:10px;padding:14px 22px;background:var(--accent);color:#17130e;font:inherit;font-weight:750;cursor:pointer;transition:background .15s,transform .15s,border-color .15s}
+button:hover{background:var(--accent-hover)}button:active{transform:translateY(1px)}button:disabled{opacity:.5;cursor:wait}
+button.alt{background:var(--paper-2);border-color:var(--line);color:var(--ink)}button.alt:hover{background:#29313d}
+button.danger{background:#382326;border-color:#63383d;color:#f0b9bb}
 button.text-button{background:transparent;color:var(--muted);font-size:13px;font-weight:550;padding:8px 12px}
 button.text-button:hover{background:transparent;color:var(--accent);text-decoration:underline}
 .hidden{display:none!important}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px;margin:18px 0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:24px;margin:18px 0}
 .field{margin:14px 0}label{display:block;font-weight:650;font-size:14px;margin:12px 0 6px}
-input,textarea{width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit}
+input,textarea{width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:#11151b;color:var(--ink);font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #b58a5022}
 textarea{min-height:100px}
 .row{display:flex;gap:10px;align-items:center}.row input{flex:1;min-width:0}
-.option{display:flex;gap:11px;align-items:center;background:#fff;border:1px solid var(--line);padding:13px 14px;border-radius:11px;margin:9px 0;font-weight:500}
+.option{display:flex;gap:11px;align-items:center;background:#151a21;border:1px solid var(--line);padding:13px 14px;border-radius:11px;margin:9px 0;font-weight:500;cursor:pointer}
+.option:hover{border-color:#596474;background:#1b222c}
 .option input{width:auto;margin:0;accent-color:var(--accent)}
 .top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
 .pill{font-size:11px;color:var(--muted);letter-spacing:.12em;font-weight:750}
-.bar{height:7px;background:#eceae3;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.bar{height:7px;background:#303844;border-radius:20px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
 .result{display:grid;grid-template-columns:minmax(100px,1fr) 2fr 25px;gap:10px;align-items:center;margin:12px 0}
-.notice{background:#f1f0e9;border-radius:10px;padding:12px;color:var(--muted);font-size:13px}
-.footer{text-align:center;color:#92958d;font-size:12px;margin:38px 0 0}
-.progress{height:4px;background:#e6e3db;border-radius:5px;margin:14px 0 24px;overflow:hidden}.progress i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.notice{background:var(--paper-2);border-radius:10px;padding:12px;color:var(--muted);font-size:13px}
+.footer{text-align:center;color:#68727f;font-size:12px;margin:38px 0 0}
+.progress{height:4px;background:#303844;border-radius:5px;margin:14px 0 24px;overflow:hidden}.progress i{display:block;height:100%;background:var(--accent);transition:width .2s}
+hr{border:0;border-top:1px solid var(--line)}
 @media(max-width:560px){header{padding-top:24px}main{padding:18px 18px 48px}.hero{min-height:66vh}.card{padding:19px}.result{grid-template-columns:minmax(90px,1fr) 1.4fr 22px}}
 </style></head><body>
 <header><div class="brand">C.A.<span>T.S.</span></div></header>
@@ -52,11 +56,8 @@ textarea{min-height:100px}
 </section>
 <section id="quizView" class="hidden"><div class="top"><span class="pill">RESULTADOS DEL GRUPO</span><button class="alt" id="resultsHome">Volver al inicio</button></div><h1 id="quizHeading">Cuestionario C.A.T.S.</h1><p class="muted">Resultados compartidos de las respuestas del grupo.</p><div id="responseCount" class="muted"></div><div id="quizResults"></div></section>
 <section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Salir</button><span class="pill">CUESTIONARIO C.A.T.S.</span></div><h1 id="answerQuizTitle"></h1><p class="muted">Responde una pregunta a la vez. Puedes volver atrás sin perder tus respuestas.</p><div class="progress"><i id="progressFill" style="width:0%"></i></div><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:24px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas registradas</h2><p class="muted">Tus respuestas se guardaron correctamente.</p><button id="answerDoneBack">Ver resultados</button></div></section>
-<div class="footer">C.A.T.S. · Versión 1.0.2</div>
-<section id="depositView" class="hidden"></section>\n<section id="quizView" class="hidden"><div class="top"><span class="pill">CUESTIONARIO PÚBLICO</span><button class="alt" id="adminToggle">Administración</button></div><h1 id="quizHeading">Cuestionario C.A.T.S.</h1><p class="muted">Todos pueden responder y consultar los resultados.</p><button id="startAnswer">Responder cuestionario</button> <button class="alt hidden" id="editQuizButton">Editar nombre</button>
-<div id="quizAdminEdit" class="card hidden"><input id="editQuizTitle"><button id="saveQuizTitle">Guardar</button></div><div id="adminPanel" class="card hidden"><h2>Administración</h2><div id="adminLogin" class="row"><input id="adminPassword" type="password" placeholder="Clave"><button id="unlockAdmin">Entrar</button></div><div id="adminTools" class="hidden"><hr><p class="muted">Puedes eliminar preguntas y añadir nuevas. El cuestionario y sus resultados son públicos.</p><div id="questionsAdmin"></div><button class="alt" id="lockAdmin">Cerrar administración</button></div></div><h2>Resultados</h2><div id="responseCount" class="muted"></div><div id="quizResults"></div><div id="responseRecords"></div></section>
-<section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Volver</button><span class="pill">RESPONDER</span></div><p id="answerDepositName" class="muted"></p><h1 id="answerQuizTitle"></h1><p class="muted">Responde una pregunta a la vez. Puedes avanzar y retroceder sin perder tus respuestas.</p><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:18px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente →</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas guardadas</h2><button id="answerDoneBack">Volver al depósito</button></div></section>
-<div class="footer">C.A.T.S. · Versión 1.0.2</div></main>
+<div class="footer">C.A.T.S. · Versión 1.0.3</div>
+</main>
 <script>
 const API_URL='https://xnqyjjqfcibxnftyrwpe.supabase.co/functions/v1/cats-api',API_KEY='sb_publishable_U3Me4PLvpauz50xGfZMvxw_HYxJoM7T',ROOT='74ae0c75-2884-420d-b922-34cf37da1b1b';
 let D,Q,admin=false,password='',step=0,draft={},submissionToken=null,submitting=false;
