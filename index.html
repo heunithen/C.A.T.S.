@@ -11,16 +11,16 @@
 <div class="card"><h2>Consultar un depósito</h2><div class="field"><label>Identificador</label><input id="depositIdInput" placeholder="Pega el identificador"></div><button class="alt" id="openDeposit">Consultar</button><div class="notice">Los depósitos y respuestas se guardan en línea y pueden consultarse desde distintos dispositivos.</div></div></div>
 <h2>Acceder a un depósito</h2><div id="depositList" class="grid"></div></section>
 <section id="depositView" class="hidden"><div class="top"><button class="alt" data-home>← Inicio</button><span class="pill">DEPÓSITO PÚBLICO</span></div><h1 id="depositTitle"></h1><p id="depositMeta" class="muted"></p><button class="alt" id="adminToggle">Administrar depósito</button> <button class="alt" id="copyDepositLink">Copiar enlace</button>
-<div id="adminPanel" class="card hidden"><h2>Administración</h2><div id="adminLogin" class="row"><input id="adminPassword" type="password" placeholder="Clave"><button id="unlockAdmin">Entrar</button></div><div id="adminTools" class="hidden"><hr><h3>Crear cuestionario</h3><input id="quizTitle" placeholder="Nombre del cuestionario"><button id="createQuiz">Crear cuestionario</button><p class="muted">Después podrás añadir preguntas, alternativas y conceptos propios.</p><button class="alt" id="lockAdmin">Cerrar administración</button></div></div>
+<div id="adminPanel" class="card hidden"><h2>Administración</h2><div id="adminLogin" class="row"><input id="adminPassword" type="password" placeholder="Clave"><button id="unlockAdmin">Entrar</button></div><div id="adminTools" class="hidden"><hr><h3>Crear cuestionario C.A.T.S.</h3><input id="quizTitle" placeholder="Nombre del cuestionario"><button id="createQuiz">Crear cuestionario</button><p class="muted">Se crearán las cuatro preguntas C.A.T.S.: Concepto, Objetivo, Tono y Líneas y Velos.</p><button class="alt" id="lockAdmin">Cerrar administración</button></div></div>
 <div class="top"><h2>Cuestionarios</h2><span id="quizCount" class="pill"></span></div><div id="quizList" class="grid"></div></section>
 <section id="quizView" class="hidden"><div class="top"><button class="alt" id="backToDeposit">← Volver al depósito</button><span class="pill">CUESTIONARIO</span></div><h1 id="quizHeading"></h1><p class="muted">Cada selección o concepto escrito suma un voto.</p><button id="copyQuizLink">Copiar enlace para responder</button> <button class="alt hidden" id="editQuizButton">Editar nombre</button>
 <div id="quizAdminEdit" class="card hidden"><input id="editQuizTitle"><button id="saveQuizTitle">Guardar</button></div><div id="questionsAdmin"></div><h2>Resultados</h2><div id="responseCount" class="muted"></div><div id="quizResults"></div><div id="responseRecords"></div></section>
-<section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Volver</button><span class="pill">RESPONDER</span></div><p id="answerDepositName" class="muted"></p><h1 id="answerQuizTitle"></h1><p class="muted">Escribe tu nombre, selecciona alternativas y añade conceptos propios si está permitido.</p><form id="answerForm" class="card"><div class="field"><label>Tu nombre</label><input id="participantName" required maxlength="50"></div><div id="answerQuestions"></div><button type="submit">Enviar respuestas</button></form><div id="answerDone" class="card hidden"><h2>Respuestas guardadas</h2><button id="answerDoneBack">Volver al depósito</button></div></section>
+<section id="answerView" class="hidden"><div class="top"><button class="alt" id="answerBack">← Volver</button><span class="pill">RESPONDER</span></div><p id="answerDepositName" class="muted"></p><h1 id="answerQuizTitle"></h1><p class="muted">Escribe tu nombre, selecciona alternativas y añade conceptos propios si está permitido.</p><div id="answerProgress" class="muted"></div><form id="answerForm" class="card"><div id="answerStepContent"></div><div class="row" style="justify-content:space-between;margin-top:18px"><button type="button" class="alt" id="answerPrev">← Anterior</button><div><button type="button" id="answerNext">Siguiente →</button><button type="submit" id="answerSubmit" class="hidden">Enviar respuestas</button></div></div></form><div id="answerDone" class="card hidden"><h2>Respuestas guardadas</h2><button id="answerDoneBack">Volver al depósito</button></div></section>
 <div class="footer">C.A.T.S. · Prototipo visual y funcional · Datos sincronizados en línea.</div></main>
 <script>
 const API_URL='https://xnqyjjqfcibxnftyrwpe.supabase.co/functions/v1/cats-api';
 const API_KEY='sb_publishable_U3Me4PLvpauz50xGfZMvxw_HYxJoM7T';
-let D=null,Q=null,admin=false,adminPassword='',answerCtx=null;
+let D=null,Q=null,admin=false,adminPassword='',answerCtx=null,answerStep=0,answerDraft={};
 const el=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const show=id=>['home','depositView','quizView','answerView'].forEach(x=>el(x).classList.toggle('hidden',x!==id));
@@ -34,25 +34,105 @@ function renderHome(){D=null;Q=null;show('home')}
 function renderDeposit(){show('depositView');el('depositTitle').textContent=D.name;el('depositMeta').textContent='ID: '+D.id+' · '+D.quizzes.length+' cuestionario(s)';el('adminPanel').classList.toggle('hidden',!admin);el('adminLogin').classList.toggle('hidden',admin);el('adminTools').classList.toggle('hidden',!admin);el('adminPassword').value='';el('quizList').innerHTML=D.quizzes.map(q=>'<div class="card"><h3>'+esc(q.title)+'</h3><p class="muted">'+q.responses.length+' respuesta(s)</p><button onclick="openQuiz(\''+q.id+'\')">Ver resultados</button> <button class="alt" onclick="copy(url(\'answer/'+D.id+'/'+q.id+'\'))">Copiar enlace</button></div>').join('')||'<p class="muted">Este depósito todavía no tiene cuestionarios.</p>';el('quizCount').textContent=D.quizzes.length+' en total'}
 function openQuiz(id){Q=getQ(id);if(Q)renderQuiz()}
 function renderQuiz(){show('quizView');el('quizHeading').textContent=Q.title;el('responseCount').textContent=Q.responses.length+' respuesta(s)';el('editQuizButton').classList.toggle('hidden',!admin);el('questionsAdmin').innerHTML=admin?'<div class="card"><h3>Preguntas</h3>'+(Q.questions.map((q,i)=>'<p><b>'+(i+1)+'. '+esc(q.text)+'</b><br><small>'+q.options.map(esc).join(' · ')+'</small><br><button class="danger" onclick="deleteQuestion(\''+q.id+'\')">Eliminar</button></p>').join('')||'<p class="muted">Aún no hay preguntas.</p>')+'<hr><h3>Añadir pregunta</h3><div class="field"><label>Enunciado</label><input id="newQuestionText"></div><div class="field"><label>Alternativas (una por línea)</label><textarea id="newQuestionOptions" placeholder="Fantasía medieval&#10;Ciencia ficción&#10;Terror"></textarea></div><label class="option"><input id="newQuestionMulti" type="checkbox" checked> Permitir varias alternativas</label><label class="option"><input id="newQuestionCustom" type="checkbox" checked> Permitir conceptos propios</label><button id="addQuestion">Añadir pregunta</button></div>':'';renderResults()}
-function renderResults(){el('quizResults').innerHTML=Q.questions.map((q,i)=>{const counts={};Q.responses.forEach(r=>{const a=r.answers[q.id]||{};[...(a.selected||[]),...(a.custom||[])].forEach(v=>counts[v]=(counts[v]||0)+1)});const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const max=Math.max(1,...entries.map(x=>x[1]));return '<div class="card"><small>PREGUNTA '+(i+1)+'</small><h3>'+esc(q.text)+'</h3>'+(entries.map(([v,n])=>'<div class="result"><span>'+esc(v)+'</span><div class="bar"><i style="width:'+(n/max*100)+'%"></i></div><b>'+n+'</b></div>').join('')||'<p class="muted">Todavía no hay votos.</p>')+'</div>'}).join('')||'<p class="muted">No hay preguntas.</p>';el('responseRecords').innerHTML=admin?'<div class="card"><h3>Respuestas individuales</h3>'+(Q.responses.map(r=>'<div class="card"><b>'+esc(r.name)+'</b><br><small>'+new Date(r.date).toLocaleString()+'</small><p>'+Q.questions.map(q=>esc(q.text)+': '+esc([...(r.answers[q.id]?.selected||[]),...(r.answers[q.id]?.custom||[])].join(', '))).join('<br>')+'</p><button class="danger" onclick="deleteResponse(\''+r.id+'\')">Eliminar respuesta</button></div>').join('')||'<p class="muted">Todavía no hay respuestas.</p>')+'</div>':''}
+function renderResults(){el('quizResults').innerHTML=Q.questions.filter(q=>!q.text.includes('Líneas y Velos')).map((q,i)=>{const counts={};Q.responses.forEach(r=>{const a=r.answers[q.id]||{};[...(a.selected||[]),...(a.custom||[])].forEach(v=>counts[v]=(counts[v]||0)+1)});const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);const max=Math.max(1,...entries.map(x=>x[1]));return '<div class="card"><small>PREGUNTA '+(i+1)+'</small><h3>'+esc(q.text)+'</h3>'+(entries.map(([v,n])=>'<div class="result"><span>'+esc(v)+'</span><div class="bar"><i style="width:'+(n/max*100)+'%"></i></div><b>'+n+'</b></div>').join('')||'<p class="muted">Todavía no hay votos.</p>')+'</div>'}).join('')||'<p class="muted">No hay preguntas.</p>';el('responseRecords').innerHTML=admin?'<div class="card"><h3>Respuestas individuales</h3>'+(Q.responses.map(r=>'<div class="card"><b>'+esc(r.name)+'</b><br><small>'+new Date(r.date).toLocaleString()+'</small><p>'+Q.questions.map(q=>esc(q.text)+': '+esc([...(r.answers[q.id]?.selected||[]),...(r.answers[q.id]?.custom||[])].join(', '))).join('<br>')+'</p><button class="danger" onclick="deleteResponse(\''+r.id+'\')">Eliminar respuesta</button></div>').join('')||'<p class="muted">Todavía no hay respuestas.</p>')+'</div>':''}
 async function reloadQuiz(){await refreshDeposit(D.id);Q=getQ(Q.id);renderQuiz()}
 async function deleteQuestion(id){if(!confirm('¿Eliminar pregunta y sus respuestas asociadas?'))return;try{await api('delete_question',{question_id:id,password:adminPassword});await reloadQuiz()}catch(e){alert(e.message)}}
 async function deleteResponse(id){if(!confirm('¿Eliminar respuesta?'))return;try{await api('delete_response',{response_id:id,password:adminPassword});await reloadQuiz()}catch(e){alert(e.message)}}
-async function startAnswer(depositId,quizId){try{await refreshDeposit(depositId);const q=getQ(quizId);if(!q)throw new Error('No se encontró el cuestionario.');answerCtx={d:D,q};el('answerDepositName').textContent=D.name;el('answerQuizTitle').textContent=q.title;el('answerDone').classList.add('hidden');el('answerForm').classList.remove('hidden');el('participantName').value='';el('answerQuestions').innerHTML=q.questions.map((item,i)=>'<div class="card"><h3>'+(i+1)+'. '+esc(item.text)+'</h3>'+item.options.map(op=>'<label class="option"><input type="'+(item.multi?'checkbox':'radio')+'" name="q_'+item.id+'" value="'+esc(op)+'"> '+esc(op)+'</label>').join('')+(item.allowCustom?'<div class="field"><label>Conceptos propios (separados por coma)</label><input name="custom_'+item.id+'"></div>':'')+'</div>').join('');show('answerView')}catch(e){alert(e.message);renderHome()}}
+function captureAnswerStep(){
+  if(!answerCtx)return;
+  if(answerStep===0){answerDraft.name=el('participantName').value.trim();return}
+  const q=answerCtx.q.questions[answerStep-1];
+  if(!q)return;
+  if(q.text.includes('Líneas y Velos')){
+    answerDraft[q.id]={selected:[],custom:[
+      'Línea: '+(el('answerLines').value.trim()),
+      'Velo: '+(el('answerVeils').value.trim())
+    ].filter(x=>!x.endsWith(': '))};
+  }else{
+    answerDraft[q.id]={
+      selected:[...document.querySelectorAll('[name="q_'+q.id+'"]:checked')].map(x=>x.value),
+      custom:(el('custom_'+q.id)?.value||'').split(',').map(x=>x.trim()).filter(Boolean)
+    };
+  }
+}
+function renderAnswerStep(){
+  const total=answerCtx.q.questions.length+1;
+  const isName=answerStep===0;
+  const isLast=answerStep===total-1;
+  el('answerProgress').textContent='Paso '+(answerStep+1)+' de '+total;
+  el('answerPrev').disabled=answerStep===0;
+  el('answerPrev').style.opacity=answerStep===0?'.45':'1';
+  el('answerNext').classList.toggle('hidden',isLast);
+  el('answerSubmit').classList.toggle('hidden',!isLast);
+  if(isName){
+    el('answerStepContent').innerHTML='<h2>Antes de comenzar</h2><div class="field"><label for="participantName">¿Cómo te llamas?</label><input id="participantName" required maxlength="50" autocomplete="name" placeholder="Tu nombre"></div>';
+    el('participantName').value=answerDraft.name||'';
+    return;
+  }
+  const q=answerCtx.q.questions[answerStep-1];
+  let body='<small>PREGUNTA '+answerStep+' DE '+answerCtx.q.questions.length+'</small><h2>'+esc(q.text)+'</h2>';
+  if(q.text.includes('Líneas y Velos')){
+    const custom=answerDraft[q.id]?.custom||[];
+    const line=custom.find(x=>x.startsWith('Línea: '))?.slice(7)||'';
+    const veil=custom.find(x=>x.startsWith('Velo: '))?.slice(6)||'';
+    body+='<div class="field"><label for="answerLines">Líneas — temas que no quieres que aparezcan en la partida</label><textarea id="answerLines" rows="4" placeholder="Escribe aquí los temas que quieres excluir por completo"></textarea></div><div class="field"><label for="answerVeils">Velos — temas que pueden aparecer, pero fuera de escena</label><textarea id="answerVeils" rows="4" placeholder="Escribe aquí los temas que no quieres que se describan explícitamente"></textarea></div>';
+    el('answerStepContent').innerHTML=body;
+    el('answerLines').value=line;el('answerVeils').value=veil;
+    return;
+  }
+  body+=q.options.map(op=>'<label class="option"><input type="'+(q.multi?'checkbox':'radio')+'" name="q_'+q.id+'" value="'+esc(op)+'"> '+esc(op)+'</label>').join('');
+  if(q.allowCustom)body+='<div class="field"><label for="custom_'+q.id+'">Otro (puedes escribir uno o varios conceptos separados por coma)</label><input id="custom_'+q.id+'" placeholder="Escribe tus propios conceptos"></div>';
+  el('answerStepContent').innerHTML=body;
+  const saved=answerDraft[q.id]||{selected:[],custom:[]};
+  saved.selected.forEach(value=>{const input=[...document.querySelectorAll('[name="q_'+q.id+'"]')].find(x=>x.value===value);if(input)input.checked=true});
+  const customInput=el('custom_'+q.id);if(customInput)customInput.value=(saved.custom||[]).join(', ');
+}
+async function startAnswer(depositId,quizId){
+  try{
+    await refreshDeposit(depositId);
+    const q=getQ(quizId);if(!q)throw new Error('No se encontró el cuestionario.');
+    answerCtx={d:D,q};answerStep=0;answerDraft={name:''};
+    el('answerDepositName').textContent=D.name;el('answerQuizTitle').textContent=q.title;
+    el('answerDone').classList.add('hidden');el('answerForm').classList.remove('hidden');
+    renderAnswerStep();show('answerView');
+  }catch(e){alert(e.message);renderHome()}
+}
 async function route(){const p=location.hash.slice(1).split('/');if(p[0]==='deposit'&&p[1])await openDepositById(p[1]);else if(p[0]==='answer'&&p[1]&&p[2])await startAnswer(p[1],p[2]);else renderHome()}
 el('createDeposit').onclick=async()=>{const name=el('newName').value.trim(),password=el('newPass').value;if(!name||!password){alert('Indica nombre y clave.');return}try{const out=await api('create_deposit',{name,password});el('newName').value='';el('newPass').value='';location.hash='deposit/'+out.deposit.id}catch(e){alert(e.message)}};
 el('openDeposit').onclick=()=>{const id=el('depositIdInput').value.trim();if(id)location.hash='deposit/'+id};
 el('adminToggle').onclick=()=>el('adminPanel').classList.toggle('hidden');
 el('unlockAdmin').onclick=async()=>{try{const password=el('adminPassword').value;await api('verify_admin',{deposit_id:D.id,password});admin=true;adminPassword=password;renderDeposit();el('adminPanel').classList.remove('hidden')}catch(e){alert(e.message)}};
 el('lockAdmin').onclick=()=>{admin=false;adminPassword='';renderDeposit()};
-el('createQuiz').onclick=async()=>{const title=el('quizTitle').value.trim();if(!title)return alert('Indica un nombre.');try{const out=await api('create_quiz',{deposit_id:D.id,title,password:adminPassword});await refreshDeposit(D.id);Q=getQ(out.quiz.id);el('quizTitle').value='';renderQuiz()}catch(e){alert(e.message)}};
+el('createQuiz').onclick=async()=>{
+  const title=el('quizTitle').value.trim();if(!title)return alert('Indica un nombre.');
+  const template=[
+    {prompt:'¿De qué quieres que trate la partida que vamos a jugar?',options:['Fantasía medieval','Fantasía oscura','Alta fantasía','Japón feudal','China antigua','Mitología y leyendas','Isekai (otro mundo)','Ciencia ficción','Cyberpunk','Terror','Misterio e investigación','Aventuras y exploración','Supervivencia','Guerra y conflictos','Intriga política','Piratas y aventuras marítimas','Oeste / Western','Steampunk','Postapocalíptico','Histórico','Otro'],multi:true,custom:true},
+    {prompt:'¿Qué te gustaría que intentaran conseguir los personajes durante la partida?',options:['Derrotar a un enemigo o antagonista','Salvar a una persona o grupo','Proteger un lugar, comunidad o territorio','Sobrevivir a una situación peligrosa','Explorar lugares desconocidos','Descubrir un misterio o resolver un enigma','Investigar un crimen o acontecimiento','Completar una misión o encargo','Encontrar un objeto, tesoro o reliquia','Conseguir riquezas o recursos','Alcanzar poder, prestigio o reconocimiento','Vengar una ofensa o injusticia','Escapar de un lugar o situación','Viajar hasta un destino','Construir, recuperar o establecer algo','Impedir una catástrofe o amenaza','Resolver un conflicto o negociar la paz','Cumplir una promesa o propósito personal','Cambiar el orden establecido','Vivir aventuras sin un objetivo definido'],multi:true,custom:true},
+    {prompt:'¿Qué tono te gustaría que tuviera la partida?',options:['Épico','Heroico','Oscuro','Humorístico','Cómico y absurdo','Dramático','Trágico','Aventurero','Misterioso','Terrorífico','Realista','Heroísmo cotidiano','Romántico','Melancólico','Satírico','Pulp','Bélico','Maravilloso'],multi:true,custom:true},
+    {prompt:'¿Qué temas o contenidos quieres establecer como Líneas y cuáles como Velos?',options:[],multi:false,custom:true}
+  ];
+  try{
+    const out=await api('create_quiz',{deposit_id:D.id,title,password:adminPassword});
+    for(const q of template)await api('add_question',{quiz_id:out.quiz.id,prompt:q.prompt,options:q.options,multi:q.multi,allow_custom:q.custom,password:adminPassword});
+    await refreshDeposit(D.id);Q=getQ(out.quiz.id);el('quizTitle').value='';renderQuiz();
+  }catch(e){alert('No se pudo crear el cuestionario completo: '+e.message)}
+};
 el('backToDeposit').onclick=async()=>{await refreshDeposit(D.id);renderDeposit()};
 el('copyDepositLink').onclick=()=>copy(url('deposit/'+D.id));
 el('copyQuizLink').onclick=()=>copy(url('answer/'+D.id+'/'+Q.id));
 el('editQuizButton').onclick=()=>{el('quizAdminEdit').classList.toggle('hidden');el('editQuizTitle').value=Q.title};
 el('saveQuizTitle').onclick=async()=>{const title=el('editQuizTitle').value.trim();if(!title)return;try{await api('rename_quiz',{quiz_id:Q.id,title,password:adminPassword});await reloadQuiz()}catch(e){alert(e.message)}};
 document.addEventListener('click',async e=>{if(e.target.id!=='addQuestion')return;const prompt=el('newQuestionText').value.trim(),options=el('newQuestionOptions').value.split('\n').map(x=>x.trim()).filter(Boolean);if(!prompt||!options.length)return alert('Completa el enunciado y las alternativas.');try{await api('add_question',{quiz_id:Q.id,prompt,options,multi:el('newQuestionMulti').checked,allow_custom:el('newQuestionCustom').checked,password:adminPassword});await reloadQuiz()}catch(err){alert(err.message)}});
-el('answerForm').onsubmit=async e=>{e.preventDefault();const name=el('participantName').value.trim(),answers={};answerCtx.q.questions.forEach(q=>{answers[q.id]={selected:[...document.querySelectorAll('[name="q_'+q.id+'"]:checked')].map(x=>x.value),custom:(document.querySelector('[name="custom_'+q.id+'"]')?.value||'').split(',').map(x=>x.trim()).filter(Boolean)}});try{await api('submit_response',{quiz_id:answerCtx.q.id,name,answers});el('answerForm').classList.add('hidden');el('answerDone').classList.remove('hidden')}catch(err){alert(err.message)}};
+el('answerPrev').onclick=()=>{captureAnswerStep();if(answerStep>0){answerStep--;renderAnswerStep()}};
+el('answerNext').onclick=()=>{captureAnswerStep();if(answerStep<answerCtx.q.questions.length){answerStep++;renderAnswerStep()}};
+el('answerForm').onsubmit=async e=>{
+  e.preventDefault();captureAnswerStep();
+  const name=(answerDraft.name||'').trim();if(!name){alert('Escribe tu nombre para continuar.');answerStep=0;renderAnswerStep();return}
+  const answers={};
+  answerCtx.q.questions.forEach(q=>{answers[q.id]=answerDraft[q.id]||{selected:[],custom:[]}});
+  try{await api('submit_response',{quiz_id:answerCtx.q.id,name,answers});el('answerForm').classList.add('hidden');el('answerProgress').classList.add('hidden');el('answerDone').classList.remove('hidden')}
+  catch(err){alert(err.message)}
+};
 el('answerBack').onclick=()=>answerCtx?location.hash='deposit/'+answerCtx.d.id:renderHome();
 el('answerDoneBack').onclick=()=>location.hash='deposit/'+answerCtx.d.id;
 document.querySelectorAll('[data-home]').forEach(b=>b.onclick=()=>{location.hash='';renderHome()});
