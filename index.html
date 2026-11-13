@@ -94,7 +94,8 @@ async function startAnswer(depositId,quizId){
     renderAnswerStep();show('answerView');
   }catch(e){alert(e.message);renderHome()}
 }
-async function route(){const p=location.hash.slice(1).split('/');if(p[0]==='answer'){if(!D||!Q)await loadPublicQuiz();startAnswer(D.id,Q.id)}else await loadPublicQuiz()}\nasync function loadPublicQuiz(){try{await refreshDeposit('74ae0c75-2884-420d-b922-34cf37da1b1b');Q=D.quizzes[0]||null;if(!Q)throw new Error('No se encontró el cuestionario.');renderQuiz()}catch(e){alert(e.message);renderHome()}}
+async function route(){const p=location.hash.slice(1).split('/');if(p[0]==='answer'){if(!D||!Q)await loadPublicQuiz();startAnswer(D.id,Q.id)}else await loadPublicQuiz()}
+async function loadPublicQuiz(){try{await refreshDeposit('74ae0c75-2884-420d-b922-34cf37da1b1b');Q=D.quizzes[0]||null;if(!Q)throw new Error('No se encontró el cuestionario.');renderQuiz()}catch(e){alert(e.message);renderHome()}}
 el('createDeposit').onclick=async()=>{const name=el('newName').value.trim(),password=el('newPass').value;if(!name||!password){alert('Indica nombre y clave.');return}try{const out=await api('create_deposit',{name,password});el('newName').value='';el('newPass').value='';location.hash='deposit/'+out.deposit.id}catch(e){alert(e.message)}};
 el('openDeposit').onclick=()=>{const id=el('depositIdInput').value.trim();if(id)location.hash='deposit/'+id};
 el('adminToggle').onclick=()=>el('adminPanel').classList.toggle('hidden');\nel('startAnswer').onclick=()=>startAnswer(D.id,Q.id);
